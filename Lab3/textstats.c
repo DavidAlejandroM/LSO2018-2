@@ -23,17 +23,25 @@ void inicializarEstadisticas(TextStats *stats){
 }
 
 void calcularEstadisticas(FILE *file, TextStats *stats){
-    char ch,
+    char ch, chAnt, chAnt2;
     //char c; //variable auxiliar para contar las palabras
     do{
         ch = getc(file);  
         stats->nroCaracteres++;   
         if(ch == ' '){
             stats->nroEspacios++;
+            if((chAnt >= 'A' && chAnt < 'Z') || (chAnt >= 'a' && chAnt < 'z') || (ch >= '0' && ch < '9'))
+            {
+                stats->nroPalabras++;
+            }
         }
         else if(ch == '\n'){
             stats->nroEspacios++;
             stats->nroLineas++;
+            if((chAnt2 >= 'A' && chAnt2 < 'Z') || (chAnt2 >= 'a' && chAnt2 < 'z') || (chAnt2 >= '0' && chAnt2 < '9'))
+            {
+                stats->nroPalabras++;
+            }
         }
         else if(ch >= 'A' && ch < 'Z'){
             stats->nroMayusculas++;
@@ -48,7 +56,9 @@ void calcularEstadisticas(FILE *file, TextStats *stats){
                 ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z'))){
                     stats->nroPalabras++;
         }
-        c = ch;*/           
+        c = ch;*/
+        chAnt2 = chAnt;
+        chAnt = ch;
     }while(ch != EOF);
 }
 
@@ -62,6 +72,8 @@ int main(int argc, char *argv[]) {
     // Inicializar los nombres de los archivos
     char inFilename[80];
     char outFilename[80];
+
+    int varControl = 1;
     strncpy(inFilename, argv[1], strlen(argv[1]) + 1);
     
     // Se implementa para generar el nombre del archivo con estadisticas, eliminando el .txt del nombre del archivo original
@@ -82,6 +94,7 @@ int main(int argc, char *argv[]) {
         printf("Error al abrir el archivo %s\n", inFilename);
         return -1;
     }
+
     printf("Obteniendo estadisticas... \n");
     inicializarEstadisticas(stats);
     calcularEstadisticas(inFile,stats);
