@@ -22,12 +22,16 @@ int main(int argc, char *argv[]) {
     char inFilename[80];
     char outFilename[80];
     strncpy(inFilename, argv[1], strlen(argv[1]) + 1);
-    strncpy(outFilename, argv[1], strlen(argv[1]) + 1);
+    char *aux = malloc(sizeof(char)*80);
+    for(int i = 0; i < (strlen(inFilename) - 4); i++){
+        *(aux + i) = *(inFilename + i);
+    }
+    strcat(aux,"_stats.txt");
+    strncpy(outFilename, aux, strlen(aux) + 1);
 
     char ch;
     FILE *inFile;
     FILE *outFile;
-    strcat(outFilename,"_stats.txt");
     inFile = fopen(inFilename,"r");
     if(inFile == NULL){
         printf("Error al abrir el archivo %s\n", inFilename);
