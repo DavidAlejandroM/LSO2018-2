@@ -43,7 +43,7 @@ int main(int argc, char *argv[]) {
         printf("Error al abrir el archivo %s\n", inFilename);
         return -1;
     }
-    
+
     stats->nroCaracteres = 0;
     stats->nroDigitos = 0;
     stats->nroEspacios = 0;
@@ -54,10 +54,28 @@ int main(int argc, char *argv[]) {
 
     do{
         ch = getc(inFile);  
-        stats->nroCaracteres ++;         
+        stats->nroCaracteres++;   
+        if(ch == ' '){
+            stats->nroEspacios++;
+        }
+        else if(ch == '\n'){
+            stats->nroEspacios++;
+            stats->nroLineas++;
+        }
+        else if(ch >= 'A' && ch < 'Z'){
+            stats->nroMayusculas++;
+        }
+        else if(ch >= 'a' && ch < 'z'){
+            stats->nroMinusculas++;
+        } 
+        else if(ch >= '0' && ch < '9'){
+            stats->nroDigitos++;
+        }    
         
     }while(ch != EOF);
-    //printf("el numero de caracteres es %d \n", stats->nroCaracteres);     
+    //printf("el numero de caracteres es %d \n", stats->nroCaracteres);
+    //printf("el numero de digitos es %d \n", stats->nroDigitos);
+              
     fclose(inFile);
     outFile = fopen(outFilename,"w");
     putc('\0',outFile);
