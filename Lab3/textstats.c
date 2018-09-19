@@ -12,6 +12,56 @@ typedef struct TextStats{
     int nroDigitos;
 } TextStats;
 
+void inicializarEstadisticas(TextStats *stats){
+    stats->nroCaracteres = 0;
+    stats->nroDigitos = 0;
+    stats->nroEspacios = 0;
+    stats->nroLineas = 0;
+    stats->nroMayusculas = 0;
+    stats->nroMinusculas = 0;
+    stats->nroPalabras = 0;
+}
+
+void calcularEstadisticas(FILE *file, TextStats *stats){
+    char ch, chAnt, chAnt2;
+    //char c; //variable auxiliar para contar las palabras
+    do{
+        ch = getc(file);  
+        stats->nroCaracteres++;   
+        if(ch == ' '){
+            stats->nroEspacios++;
+            if((chAnt >= 'A' && chAnt < 'Z') || (chAnt >= 'a' && chAnt < 'z') || (ch >= '0' && ch < '9'))
+            {
+                stats->nroPalabras++;
+            }
+        }
+        else if(ch == '\n'){
+            stats->nroEspacios++;
+            stats->nroLineas++;
+            if((chAnt2 >= 'A' && chAnt2 < 'Z') || (chAnt2 >= 'a' && chAnt2 < 'z') || (chAnt2 >= '0' && chAnt2 < '9'))
+            {
+                stats->nroPalabras++;
+            }
+        }
+        else if(ch >= 'A' && ch < 'Z'){
+            stats->nroMayusculas++;
+        }
+        else if(ch >= 'a' && ch < 'z'){
+            stats->nroMinusculas++;
+        } 
+        else if(ch >= '0' && ch < '9'){
+            stats->nroDigitos++;
+        } 
+        /*else if((ch == ' ' || ch == '\n'  || (ch >= ',' && ch <= '.') || (ch >= ':' && ch <= ';')) && 
+                ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z'))){
+                    stats->nroPalabras++;
+        }
+        c = ch;*/
+        chAnt2 = chAnt;
+        chAnt = ch;
+    }while(ch != EOF);
+}
+
 int main(int argc, char *argv[]) {
 
     if (argc==1){
@@ -36,7 +86,6 @@ int main(int argc, char *argv[]) {
     free(aux);
 
     // Creación de variables y apuntadores para el manejo de los archivos
-    char ch, chAnt, chAnt2;
     TextStats *stats = malloc(sizeof(TextStats));
     FILE *inFile, *outFile;
     inFile = fopen(inFilename,"r");
@@ -46,59 +95,24 @@ int main(int argc, char *argv[]) {
         return -1;
     }
 
-    stats->nroCaracteres = 0;
-    stats->nroDigitos = 0;
-    stats->nroEspacios = 0;
-    stats->nroLineas = 0;
-    stats->nroMayusculas = 0;
-    stats->nroMinusculas = 0;
-    stats->nroPalabras = 0;
-
-    do{
-        ch = getc(inFile);
-        if(ch == -1) stats->nroCaracteres--;
-        //printf("%c => %d\n",ch,ch);
-        stats->nroCaracteres++;
-        if(ch == ' '){
-            stats->nroEspacios++;
-            
-            if((chAnt >= 'A' && chAnt < 'Z') || (chAnt >= 'a' && chAnt < 'z') || (ch >= '0' && ch < '9'))
-            {
-                stats->nroPalabras++;
-            }
-        }
-        else if(ch == '\n'){
-            stats->nroEspacios++;
-            stats->nroLineas++;
-            if((chAnt2 >= 'A' && chAnt2 < 'Z') || (chAnt2 >= 'a' && chAnt2 < 'z') || (chAnt2 >= '0' && chAnt2 < '9'))
-            {
-                stats->nroPalabras++;
-            }
-        }
-        else if(ch >= 'A' && ch < 'Z'){
-            stats->nroMayusculas++;
-        }
-        else if(ch >= 'a' && ch < 'z'){
-            stats->nroMinusculas++;
-        } 
-        else if(ch >= '0' && ch < '9'){
-            stats->nroDigitos++;
-        }
-        chAnt2 = chAnt;
-        chAnt = ch;
-        
-    }while(ch != EOF);
-    printf("el numero de caracteres es %d \n", stats->nroCaracteres);
-    printf("el numero de digitos es %d \n", stats->nroDigitos);
-    printf("el numero de espacios es %d \n", stats->nroEspacios);
-    printf("el numero de lineas es %d \n", stats->nroLineas);
-    printf("el numero de mayusculas es %d \n", stats->nroMayusculas);
-    printf("el numero de minusculas es %d \n", stats->nroMinusculas);
-    printf("el numero de palabras es %d \n", stats->nroPalabras);
-              
+    printf("Obteniendo estadisticas... \n");
+    inicializarEstadisticas(stats);
+    calcularEstadisticas(inFile,stats);
     fclose(inFile);
+    printf("-%s --> generando reporte %s \n", inFilename, outFilename);
+    
+    // Escribiendo en el archivo generado
     outFile = fopen(outFilename,"w");
+    fprintf(outFile, "chars: %d \n", stats->nroCaracteres);
+    fprintf(outFile, "words: %d \n", stats->nroPalabras);
+    fprintf(outFile, "lines: %d \n", stats->nroLineas);
+    fprintf(outFile, "whitespaces: %d \n", stats->nroEspacios);    
+    fprintf(outFile, "uppercase: %d \n", stats->nroMayusculas);
+    fprintf(outFile, "lowercase: %d \n", stats->nroMinusculas);
+    fprintf(outFile, "digits: %d \n", stats->nroDigitos);
     putc('\0',outFile);
     fclose(outFile);
+    free(stats);
+    printf("Estadisticas culminadas \n");
     return 0;
 }
