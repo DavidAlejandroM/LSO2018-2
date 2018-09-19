@@ -27,19 +27,17 @@ void calcularEstadisticas(FILE *file, TextStats *stats){
     //char c; //variable auxiliar para contar las palabras
     do{
         ch = getc(file);  
+        if(ch == -1) stats->nroCaracteres--; //Elimina ruido del texto
         stats->nroCaracteres++;   
         if(ch == ' '){
             stats->nroEspacios++;
-            if((chAnt >= 'A' && chAnt < 'Z') || (chAnt >= 'a' && chAnt < 'z') || (ch >= '0' && ch < '9'))
-            {
+            if((chAnt >= 'A' && chAnt <= 'Z') || (chAnt >= 'a' && chAnt <= 'z') || (chAnt >= '0' && chAnt < '9')){
                 stats->nroPalabras++;
             }
         }
         else if(ch == '\n'){
-            stats->nroEspacios++;
             stats->nroLineas++;
-            if((chAnt2 >= 'A' && chAnt2 < 'Z') || (chAnt2 >= 'a' && chAnt2 < 'z') || (chAnt2 >= '0' && chAnt2 < '9'))
-            {
+            if((chAnt2 >= 'A' && chAnt2 <= 'Z') || (chAnt2 >= 'a' && chAnt2 <= 'z') || (chAnt2 >= '0' && chAnt2 < '9')){
                 stats->nroPalabras++;
             }
         }
@@ -51,12 +49,7 @@ void calcularEstadisticas(FILE *file, TextStats *stats){
         } 
         else if(ch >= '0' && ch < '9'){
             stats->nroDigitos++;
-        } 
-        /*else if((ch == ' ' || ch == '\n'  || (ch >= ',' && ch <= '.') || (ch >= ':' && ch <= ';')) && 
-                ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z'))){
-                    stats->nroPalabras++;
         }
-        c = ch;*/
         chAnt2 = chAnt;
         chAnt = ch;
     }while(ch != EOF);
@@ -72,8 +65,6 @@ int main(int argc, char *argv[]) {
     // Inicializar los nombres de los archivos
     char inFilename[80];
     char outFilename[80];
-
-    int varControl = 1;
     strncpy(inFilename, argv[1], strlen(argv[1]) + 1);
     
     // Se implementa para generar el nombre del archivo con estadisticas, eliminando el .txt del nombre del archivo original
@@ -88,13 +79,12 @@ int main(int argc, char *argv[]) {
     // Creación de variables y apuntadores para el manejo de los archivos
     TextStats *stats = malloc(sizeof(TextStats));
     FILE *inFile, *outFile;
-    inFile = fopen(inFilename,"r");
+    inFile = fopen(inFilename,"r+");
     // Comprobar que el archivo se ha abierto
     if(inFile == NULL){
         printf("Error al abrir el archivo %s\n", inFilename);
         return -1;
     }
-
     printf("Obteniendo estadisticas... \n");
     inicializarEstadisticas(stats);
     calcularEstadisticas(inFile,stats);
@@ -104,8 +94,8 @@ int main(int argc, char *argv[]) {
     // Escribiendo en el archivo generado
     outFile = fopen(outFilename,"w");
     fprintf(outFile, "chars: %d \n", stats->nroCaracteres);
-    fprintf(outFile, "words: %d \n", stats->nroPalabras);
-    fprintf(outFile, "lines: %d \n", stats->nroLineas);
+    fprintf(outFile, "words: %d \n", stats->nroPalabras + 1); //no cuenta la ultima palabra
+    fprintf(outFile, "lines: %d \n", stats->nroLineas + 1); //no cuenta la ultima linea
     fprintf(outFile, "whitespaces: %d \n", stats->nroEspacios);    
     fprintf(outFile, "uppercase: %d \n", stats->nroMayusculas);
     fprintf(outFile, "lowercase: %d \n", stats->nroMinusculas);
