@@ -10,7 +10,7 @@ struct textStats{
     int nroMayusculas;
     int nroMinusculas;
     int nroDigitos;
-}
+};
 
 int main(int argc, char *argv[]) {
 
@@ -18,8 +18,12 @@ int main(int argc, char *argv[]) {
        printf("Debes ingresar mas parametros...\n");
        return 1;
     }
-    char inFilename [80] = argv[1];
-    char outFilename [80]= inFilename;
+
+    char inFilename[80];
+    char outFilename[80];
+    strncpy(inFilename, argv[1], strlen(argv[1]) + 1);
+    strncpy(outFilename, argv[1], strlen(argv[1]) + 1);
+
     char ch;
     FILE *inFile;
     FILE *outFile;
