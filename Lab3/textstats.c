@@ -23,8 +23,7 @@ void inicializarEstadisticas(TextStats *stats){
 }
 
 void calcularEstadisticas(FILE *file, TextStats *stats){
-    char ch, chAnt, chAnt2;
-    //char c; //variable auxiliar para contar las palabras
+    char ch, chAnt, chAnt2; //chAnt y chAnt2 son variables auxiliares para contar las palabras
     do{
         ch = getc(file);  
         if(ch == -1) stats->nroCaracteres--; //Elimina ruido del texto
