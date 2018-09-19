@@ -22,6 +22,8 @@ int main(int argc, char *argv[]) {
     // Inicializar los nombres de los archivos
     char inFilename[80];
     char outFilename[80];
+
+    int varControl = 1;
     strncpy(inFilename, argv[1], strlen(argv[1]) + 1);
     
     // Se implementa para generar el nombre del archivo con estadisticas, eliminando el .txt del nombre del archivo original
@@ -34,7 +36,7 @@ int main(int argc, char *argv[]) {
     free(aux);
 
     // Creación de variables y apuntadores para el manejo de los archivos
-    char ch;
+    char ch, chAnt, chAnt2;
     TextStats *stats = malloc(sizeof(TextStats));
     FILE *inFile, *outFile;
     inFile = fopen(inFilename,"r");
@@ -53,14 +55,25 @@ int main(int argc, char *argv[]) {
     stats->nroPalabras = 0;
 
     do{
-        ch = getc(inFile);  
-        stats->nroCaracteres++;   
+        ch = getc(inFile);
+        if(ch == -1) stats->nroCaracteres--;
+        //printf("%c => %d\n",ch,ch);
+        stats->nroCaracteres++;
         if(ch == ' '){
             stats->nroEspacios++;
+            
+            if((chAnt >= 'A' && chAnt < 'Z') || (chAnt >= 'a' && chAnt < 'z') || (ch >= '0' && ch < '9'))
+            {
+                stats->nroPalabras++;
+            }
         }
         else if(ch == '\n'){
             stats->nroEspacios++;
             stats->nroLineas++;
+            if((chAnt2 >= 'A' && chAnt2 < 'Z') || (chAnt2 >= 'a' && chAnt2 < 'z') || (chAnt2 >= '0' && chAnt2 < '9'))
+            {
+                stats->nroPalabras++;
+            }
         }
         else if(ch >= 'A' && ch < 'Z'){
             stats->nroMayusculas++;
@@ -70,11 +83,18 @@ int main(int argc, char *argv[]) {
         } 
         else if(ch >= '0' && ch < '9'){
             stats->nroDigitos++;
-        }    
+        }
+        chAnt2 = chAnt;
+        chAnt = ch;
         
     }while(ch != EOF);
-    //printf("el numero de caracteres es %d \n", stats->nroCaracteres);
-    //printf("el numero de digitos es %d \n", stats->nroDigitos);
+    printf("el numero de caracteres es %d \n", stats->nroCaracteres);
+    printf("el numero de digitos es %d \n", stats->nroDigitos);
+    printf("el numero de espacios es %d \n", stats->nroEspacios);
+    printf("el numero de lineas es %d \n", stats->nroLineas);
+    printf("el numero de mayusculas es %d \n", stats->nroMayusculas);
+    printf("el numero de minusculas es %d \n", stats->nroMinusculas);
+    printf("el numero de palabras es %d \n", stats->nroPalabras);
               
     fclose(inFile);
     outFile = fopen(outFilename,"w");
