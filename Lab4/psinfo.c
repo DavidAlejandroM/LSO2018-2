@@ -44,9 +44,7 @@ int main(int argc, char *argv[]){
     char valor[200];
     char voluntary[200];
     while (fgets(line, 100, inFile) != NULL){
-        //fgets(line,300,inFile);
         separarInfoValor(line, info, valor);
-        //printf("%s  %s\n",info,valor);
         if(strcmp(info, "Name") == 0){
             printf("Nombre del proceso: %s \n",valor);
         }
@@ -66,7 +64,6 @@ int main(int argc, char *argv[]){
             printf("\tTamaño de la sección de memoria STACK: %s \n",valor);            
         }
         else if(strcmp(info, "voluntary_ctxt_switches") == 0){
-            //memset(voluntary, '\0', sizeof(voluntary));
             strncpy(voluntary,valor,strlen(valor));      
         }
          else if(strcmp(info, "nonvoluntary_ctxt_switches") == 0){
