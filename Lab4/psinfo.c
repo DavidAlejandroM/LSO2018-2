@@ -2,18 +2,21 @@
 #include <stdlib.h>
 #include <string.h>
 
+
 void separarInfoValor(char *linea, char *info, char *valor){
     int i = 0, j = 0;
     do{
         *(info + i) = *(linea + i);
         i++;
-    }while(*(linea + i) != ':');
+    }while(*(linea + i) != 58);
+    *(info + i) = 0;
     i++;
     do{
         *(valor + j) = *(linea + i);
         i++;
         j++;
-    }while(*(linea + i) != '\n');
+    }while(*(linea + i) != 0);
+    *(valor + j) = 0;
 }
 
 int main(int argc, char *argv[]){
@@ -36,13 +39,12 @@ int main(int argc, char *argv[]){
         return -1;
     }
     // Inicio de la lectura del archivo
-    char line[100];
-    char info[40];
-    char valor[60];
-    char voluntary[60];
-    while (feof(inFile) == 0){
-        fgets(line,100,inFile);
-        separarInfoValor(line, info, valor);    
+    char line[300];
+    char info[60];
+    char valor[200];
+    char voluntary[200];
+    while (fgets(line, 100, inFile) != NULL){
+        separarInfoValor(line, info, valor);
         if(strcmp(info, "Name") == 0){
             printf("Nombre del proceso: %s \n",valor);
         }
@@ -62,13 +64,13 @@ int main(int argc, char *argv[]){
             printf("\tTamaño de la sección de memoria STACK: %s \n",valor);            
         }
         else if(strcmp(info, "voluntary_ctxt_switches") == 0){
-            strncpy(voluntary,valor,strlen(valor));       
+            strncpy(voluntary,valor,strlen(valor));      
         }
-        else if(strcmp(info, "nonvoluntary_ctxt_switches") == 0){
+         else if(strcmp(info, "nonvoluntary_ctxt_switches") == 0){
             printf("Número de cambios de contexto realizados (voluntarios - no voluntarios): %s - %s\n", voluntary,valor);            
         }
         memset(info, '\0', sizeof(info));
-        memset(valor, '\0', sizeof(valor));           
+        memset(valor, '\0', sizeof(valor));
     }
     fclose(inFile);
     return 0;
