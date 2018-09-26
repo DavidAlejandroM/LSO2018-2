@@ -1,33 +1,7 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include "psinfo.h"
 
-
-void separarInfoValor(char *linea, char *info, char *valor){
-    int i = 0, j = 0;
-    do{
-        *(info + i) = *(linea + i);
-        i++;
-    }while(*(linea + i) != 58);
-    *(info + i) = 0;
-    i++;
-    do{
-        *(valor + j) = *(linea + i);
-        i++;
-        j++;
-    }while(*(linea + i) != 0);
-    *(valor + j) = 0;
-}
-
-int main(int argc, char *argv[]){
-    // Comprobar que se haya ingresado el parámetro (PID)
-    if (argc==1){
-       printf("Debes ingresar mas parametros...\n");
-       return 1;
-    }
+int showInfoProccess(char *pid){
     // Inicialización de variables
-    char pid[10];
-    strncpy(pid, argv[1], strlen(argv[1]) + 1);
     char ruta[80] = "/proc/";
     strcat(ruta,pid);
     strcat(ruta,"/status");
@@ -43,8 +17,10 @@ int main(int argc, char *argv[]){
     char info[60];
     char valor[200];
     char voluntary[200];
-    while (fgets(line, 100, inFile) != NULL){
+    while (fgets(line, 300, inFile) != NULL){
+        //fgets(line,300,inFile);
         separarInfoValor(line, info, valor);
+        //printf("%s  %s\n",info,valor);
         if(strcmp(info, "Name") == 0){
             printf("Nombre del proceso: %s \n",valor);
         }
@@ -64,14 +40,36 @@ int main(int argc, char *argv[]){
             printf("\tTamaño de la sección de memoria STACK: %s \n",valor);            
         }
         else if(strcmp(info, "voluntary_ctxt_switches") == 0){
+            memset(voluntary, '\0', sizeof(voluntary));  
             strncpy(voluntary,valor,strlen(valor));      
         }
          else if(strcmp(info, "nonvoluntary_ctxt_switches") == 0){
-            printf("Número de cambios de contexto realizados (voluntarios - no voluntarios): %s - %s\n", voluntary,valor);            
+            printf("Número de cambios de contexto realizados (voluntarios - no voluntarios): %s - %s\n", voluntary,valor);          
         }
         memset(info, '\0', sizeof(info));
         memset(valor, '\0', sizeof(valor));
+        if(feof(inFile) == 0){
+            //break;
+        }
     }
     fclose(inFile);
-    return 0;
+
+    return 1;
 }
+
+void separarInfoValor(char *linea, char *info, char *valor){
+    int i = 0, j = 0;
+    do{
+        *(info + i) = *(linea + i);
+        i++;
+    }while(*(linea + i) != 58);
+    *(info + i) = 0;
+    i++;
+    do{
+        *(valor + j) = *(linea + i);
+        i++;
+        j++;
+    }while(*(linea + i) != 0);
+    *(valor + j) = 0;
+}
+
