@@ -16,24 +16,30 @@ int main(int argc, char *argv[]){
             return 1;
         }
         printf("-- Información recolectada!!!\n");
-        InfoProccess *infoP = malloc(sizeof(InfoProccess));
+        InfoProccess *infoP;
+        infoP = malloc(sizeof(InfoProccess));
         
         for(int i = 2; i < argc; i++)
         {
+            // Inicialización de variables
             char pid[10];
             strncpy(pid, argv[i], strlen(argv[i]) + 1);
-            showInfoProccess(pid, infoP);
-            printf("Pid: %s\nNombre de proceso: %s\nEstado: %s\nTamaño total de la imagen de memoria: %s\n
-                \tTamaño de la memoria en la región TEXT: %s\n\tTamaño de la memoria en la región DATA: %s\n
-                \tTamaño de la memoria en la región STACK: %s\n
-                Número de cambios de contexto realizados (voluntarios - no voluntarios): %s - %s\n",
-                pid,infoP->name,infoP->state,infoP->memTotal,infoP->memText,infoP->memData,
-                infoP->memStack,infoP->voluntario,infoP->noVoluntario);
+            char ruta[80] = "/proc/";
+            strcat(ruta,pid);
+            strcat(ruta,"/status");
+            FILE *inFile;
+            inFile = fopen(ruta,"r");
+            // Comprobar que el archivo se ha abierto
+            if(inFile == NULL){
+                printf("Error al abrir el archivo %s\n",ruta);
+                return -1;
+            }
+            showInfoProccess(pid, infoP);            
         }        
     }
     else{
         printf("NO es una lista");
-        showInfoProccess(flag);
+        //showInfoProccess(flag);
     }
    
     return 0;

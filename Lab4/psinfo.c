@@ -1,15 +1,6 @@
 #include "psinfo.h"
 
-struct InfoProccess{
-    char name[60];
-    char state[60];
-    char memTotal[60];
-    char memText[60];
-    char memData[60];
-    char memStack[60];
-    char voluntario[60];
-    char noVoluntario[60];
-};
+
 
 void separarInfoValor(char *linea, char *info, char *valor){
     int i = 0, j = 0;
@@ -25,52 +16,50 @@ void separarInfoValor(char *linea, char *info, char *valor){
     }while(*(linea + i) != '\n');
 }
 
-int showInfoProccess(char *pid, InfoProccess estructura){
-    // Inicialización de variables
-    char ruta[80] = "/proc/";
-    strcat(ruta,pid);
-    strcat(ruta,"/status");
-    FILE *inFile;
-    inFile = fopen(ruta,"r");
-    // Comprobar que el archivo se ha abierto
-    if(inFile == NULL){
-        printf("Error al abrir el archivo %s\n",ruta);
-        return -1;
-    }
-    // Inicio de la lectura del archivo
-    char line[100];
-    char info[40];
-    char valor[60];
-    char voluntary[60];
+int showInfoProccess(char *pid,struct InfoProccess *estructura){
+      // Inicio de la lectura del archivo
+    InfoProccess *infoP = malloc(sizeof(InfoProccess));
+    char *line = malloc(sizeof(char)*100);
+    char *info = malloc(sizeof(char)*40);
+    char *valor = malloc(sizeof(char)*60);
     while (fgets(line,100,inFile) != NULL){
         separarInfoValor(line, info, valor); 
         if(strcmp(info, "Name") == 0){
-            strncpy(estructura->name,valor,strlen(valor) + 1);
+            strncpy(infoP->name,valor,strlen(valor) + 1);
         }
         else if(strcmp(info, "State") == 0){
-            strncpy(estructura->state,valor,strlen(valor) + 1);
+            strncpy(infoP->state,valor,strlen(valor) + 1);
         }
         else if(strcmp(info, "VmPeak") == 0){
-            strncpy(estructura->memTotal,valor,strlen(valor) + 1);          
+            strncpy(infoP->memTotal,valor,strlen(valor) + 1);          
         }
         else if(strcmp(info, "VmExe") == 0){
-            strncpy(estructura->memText,valor,strlen(valor) + 1);           
+            strncpy(infoP->memText,valor,strlen(valor) + 1);           
         }
         else if(strcmp(info, "VmData") == 0){
-            strncpy(estructura->memData,valor,strlen(valor) + 1);            
+            strncpy(infoP->memData,valor,strlen(valor) + 1);            
         }
         else if(strcmp(info, "VmStk") == 0){
-           strncpy(estructura->memStack,valor,strlen(valor) + 1);           
+           strncpy(infoP->memStack,valor,strlen(valor) + 1);           
         }
         else if(strcmp(info, "voluntary_ctxt_switches") == 0){
-            strncpy(estructura->voluntario,valor,strlen(valor) + 1);       
+            strncpy(infoP->voluntario,valor,strlen(valor) + 1);       
         }
         else if(strcmp(info, "nonvoluntary_ctxt_switches") == 0){
-            strncpy(estructura->noVoluntario,valor,strlen(valor) + 1);            
+            strncpy(infoP->noVoluntario,valor,strlen(valor) + 1);            
         }
         memset(info, '\0', sizeof(info));
         memset(valor, '\0', sizeof(valor));       
     }
     fclose(inFile);
-    return 0;
+    printf("Pid: %s\nNombre de proceso: %s\nEstado: %s\nTamaño total de la imagen de memoria: %s\n
+                \tTamaño de la memoria en la región TEXT: %s\n\tTamaño de la memoria en la región DATA: %s\n
+                \tTamaño de la memoria en la región STACK: %s\n
+                Número de cambios de contexto realizados (voluntarios - no voluntarios): %s - %s\n",
+                pid,infoP->name,infoP->state,infoP->memTotal,infoP->memText,infoP->memData,
+                infoP->memStack,infoP->voluntario,infoP->noVoluntario);
+    free(infoP);
+    free(line);
+    free(info);
+    free(valor);
 }
