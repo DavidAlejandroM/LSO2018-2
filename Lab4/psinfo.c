@@ -7,22 +7,24 @@ void separarInfoValor(char *linea, char *info, char *valor){
     do{
         *(info + i) = *(linea + i);
         i++;
-    }while(*(linea + i) != ':');
+    }while(*(linea + i) != 58);
+    *(info + i) = 0;
     i++;
     do{
         *(valor + j) = *(linea + i);
         i++;
         j++;
-    }while(*(linea + i) != '\n');
+    }while(*(linea + i) != 0);
+    *(valor + j) = 0;
 }
 
-int showInfoProccess(char *pid,struct InfoProccess *estructura){
+int showInfoProccess(char *pid, FILE *inFile){
       // Inicio de la lectura del archivo
     InfoProccess *infoP = malloc(sizeof(InfoProccess));
     char *line = malloc(sizeof(char)*100);
-    char *info = malloc(sizeof(char)*40);
-    char *valor = malloc(sizeof(char)*60);
-    while (fgets(line,100,inFile) != NULL){
+    char *info = malloc(sizeof(char)*60);
+    char *valor = malloc(sizeof(char)*200);
+    while (fgets(line,300,inFile) != NULL){
         separarInfoValor(line, info, valor); 
         if(strcmp(info, "Name") == 0){
             strncpy(infoP->name,valor,strlen(valor) + 1);
@@ -51,15 +53,20 @@ int showInfoProccess(char *pid,struct InfoProccess *estructura){
         memset(info, '\0', sizeof(info));
         memset(valor, '\0', sizeof(valor));       
     }
-    fclose(inFile);
-    printf("Pid: %s\nNombre de proceso: %s\nEstado: %s\nTamaño total de la imagen de memoria: %s\n
-                \tTamaño de la memoria en la región TEXT: %s\n\tTamaño de la memoria en la región DATA: %s\n
-                \tTamaño de la memoria en la región STACK: %s\n
-                Número de cambios de contexto realizados (voluntarios - no voluntarios): %s - %s\n",
-                pid,infoP->name,infoP->state,infoP->memTotal,infoP->memText,infoP->memData,
-                infoP->memStack,infoP->voluntario,infoP->noVoluntario);
+    printf("Pid: %s\n",pid);
+    printf("Nombre de proceso: %s\n",infoP->name);
+    printf("Estado: %s\n",infoP->state); 
+    printf("Tamaño total de la imagen de memoria: %s\n",infoP->memTotal);
+    printf("\tTamaño de la memoria en la región TEXT: %s\n",infoP->memText);
+    printf("\tTamaño de la memoria en la región DATA: %s\n",infoP->memData);
+    printf("\tTamaño de la memoria en la región STACK: %s\n",infoP->memStack);
+    printf("Número de cambios de contexto realizados (voluntarios - no voluntarios): %s - %s\n",infoP->voluntario,infoP->noVoluntario);
+    infoP = NULL;
     free(infoP);
+    line = NULL;
     free(line);
+    info = NULL;
     free(info);
+    valor = NULL;
     free(valor);
 }

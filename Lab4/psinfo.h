@@ -7,17 +7,17 @@
 #define PSINFO_H_
 
 typedef struct InfoProccess{
-    char name[60];
-    char state[60];
-    char memTotal[60];
-    char memText[60];
-    char memData[60];
-    char memStack[60];
-    char voluntario[60];
-    char noVoluntario[60];
+    char name[200];
+    char state[200];
+    char memTotal[200];
+    char memText[200];
+    char memData[200];
+    char memStack[200];
+    char voluntario[200];
+    char noVoluntario[200];
 } InfoProccess;
 
-int showInfoProccess(char *pid, struct InfoProccess *estructura);
+int showInfoProccess(char *pid, FILE *inFile);
 void separarInfoValor(char *linea, char *info, char *valor);
 
-#endif // FOO_H_
+#endif // FOO_H_    

@@ -34,7 +34,8 @@ int main(int argc, char *argv[]){
                 printf("Error al abrir el archivo %s\n",ruta);
                 return -1;
             }
-            showInfoProccess(pid, infoP);            
+            showInfoProccess(pid, inFile); 
+            fclose(inFile);          
         }        
     }
     else{
