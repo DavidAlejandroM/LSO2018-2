@@ -17,7 +17,7 @@ typedef struct InfoProccess{
     char noVoluntario[200];
 } InfoProccess;
 
-int showInfoProccess(char *pid, FILE *inFile);
+int showInfoProccess(char *pid, FILE *inFile, int type, char *filename);
 void separarInfoValor(char *linea, char *info, char *valor);
 
 #endif // FOO_H_    

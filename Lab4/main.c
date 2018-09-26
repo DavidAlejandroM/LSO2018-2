@@ -1,4 +1,5 @@
 #include "psinfo.h"
+#include "report.h"
 
 int main(int argc, char *argv[]){
     // Comprobar que se haya ingresado el parámetro (PID)
@@ -10,7 +11,7 @@ int main(int argc, char *argv[]){
     char flag[10];
     strncpy(flag, argv[1], strlen(argv[1]) + 1);
 
-    if(strcmp(flag,"-l") == 0){
+    if(strcmp(flag,"-l") == 0 || strcmp(flag,"-r") == 0){
         if(argc <= 2){
             printf("Debes ingresar PID...\n");
             return 1;
@@ -18,6 +19,16 @@ int main(int argc, char *argv[]){
         printf("-- Información recolectada!!!\n");
         InfoProccess *infoP;
         infoP = malloc(sizeof(InfoProccess));
+        int type = 0;
+        // validamos que bandera entró el usuario
+        if(strcmp(flag,"-l") == 0){
+            type = 1;
+        }else if(strcmp(flag,"-r") == 0){
+            type = 2;
+        }
+
+        char fileNameReport[100];
+        getReportFileName(argv,argc,fileNameReport);
         
         for(int i = 2; i < argc; i++)
         {
@@ -34,12 +45,12 @@ int main(int argc, char *argv[]){
                 printf("Error al abrir el archivo %s\n",ruta);
                 return -1;
             }
-            showInfoProccess(pid, inFile); 
+            showInfoProccess(pid, inFile,type,fileNameReport); 
             fclose(inFile);          
         }        
     }
     else{
-        printf("NO es una lista");
+        //printf("NO es una lista");
         //showInfoProccess(flag);
     }
    
