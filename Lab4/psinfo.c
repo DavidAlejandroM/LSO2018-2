@@ -1,7 +1,5 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
+#include "psinfo.h"
+#include "report.h"
 
 void separarInfoValor(char *linea, char *info, char *valor){
     int i = 0, j = 0;
@@ -19,59 +17,64 @@ void separarInfoValor(char *linea, char *info, char *valor){
     *(valor + j) = 0;
 }
 
-int main(int argc, char *argv[]){
-    // Comprobar que se haya ingresado el parámetro (PID)
-    if (argc==1){
-       printf("Debes ingresar mas parametros...\n");
-       return 1;
-    }
-    // Inicialización de variables
-    char pid[10];
-    strncpy(pid, argv[1], strlen(argv[1]) + 1);
-    char ruta[80] = "/proc/";
-    strcat(ruta,pid);
-    strcat(ruta,"/status");
-    FILE *inFile;
-    inFile = fopen(ruta,"r");
-    // Comprobar que el archivo se ha abierto
-    if(inFile == NULL){
-        printf("Error al abrir el archivo %s\n",ruta);
-        return -1;
-    }
-    // Inicio de la lectura del archivo
-    char line[300];
-    char info[60];
-    char valor[200];
-    char voluntary[200];
-    while (fgets(line, 100, inFile) != NULL){
-        separarInfoValor(line, info, valor);
+int showInfoProccess(char *pid, FILE *inFile, int type, char *filename){
+      // Inicio de la lectura del archivo
+    InfoProccess *infoP = malloc(sizeof(InfoProccess));
+    char *line = malloc(sizeof(char)*100);
+    char *info = malloc(sizeof(char)*60);
+    char *valor = malloc(sizeof(char)*200);
+    while (fgets(line,300,inFile) != NULL){
+        separarInfoValor(line, info, valor); 
         if(strcmp(info, "Name") == 0){
-            printf("Nombre del proceso: %s \n",valor);
+            strncpy(infoP->name,valor,strlen(valor) + 1);
         }
         else if(strcmp(info, "State") == 0){
-            printf("Estado del proceso: %s \n",valor);
+            strncpy(infoP->state,valor,strlen(valor) + 1);
         }
         else if(strcmp(info, "VmPeak") == 0){
-            printf("Tamaño total de la imagen de memoria: %s \n",valor);            
+            strncpy(infoP->memTotal,valor,strlen(valor) + 1);          
         }
         else if(strcmp(info, "VmExe") == 0){
-            printf("\tTamaño de la sección de memoria TEXT: %s \n",valor);            
+            strncpy(infoP->memText,valor,strlen(valor) + 1);           
         }
         else if(strcmp(info, "VmData") == 0){
-            printf("\tTamaño de la sección de memoria DATA: %s \n",valor);            
+            strncpy(infoP->memData,valor,strlen(valor) + 1);            
         }
         else if(strcmp(info, "VmStk") == 0){
-            printf("\tTamaño de la sección de memoria STACK: %s \n",valor);            
+           strncpy(infoP->memStack,valor,strlen(valor) + 1);           
         }
         else if(strcmp(info, "voluntary_ctxt_switches") == 0){
-            strncpy(voluntary,valor,strlen(valor));      
+            strncpy(infoP->voluntario,valor,strlen(valor) + 1);       
         }
-         else if(strcmp(info, "nonvoluntary_ctxt_switches") == 0){
-            printf("Número de cambios de contexto realizados (voluntarios - no voluntarios): %s - %s\n", voluntary,valor);            
+        else if(strcmp(info, "nonvoluntary_ctxt_switches") == 0){
+            strncpy(infoP->noVoluntario,valor,strlen(valor) + 1);            
         }
         memset(info, '\0', sizeof(info));
-        memset(valor, '\0', sizeof(valor));
+        memset(valor, '\0', sizeof(valor));       
     }
-    fclose(inFile);
-    return 0;
+
+	if(type == 1){
+        printf("Pid: %s\n",pid);
+        printf("Nombre de proceso: %s\n",infoP->name);
+        printf("Estado: %s\n",infoP->state); 
+        printf("Tamaño total de la imagen de memoria: %s\n",infoP->memTotal);
+        printf("\tTamaño de la memoria en la región TEXT: %s\n",infoP->memText);
+        printf("\tTamaño de la memoria en la región DATA: %s\n",infoP->memData);
+        printf("\tTamaño de la memoria en la región STACK: %s\n",infoP->memStack);
+        printf("Número de cambios de contexto realizados (voluntarios - no voluntarios): %s - %s\n",infoP->voluntario,infoP->noVoluntario);
+        printf("-------------------------------------------------------------------------------------------\n");
+	
+    }
+	else if(type == 2){
+		generateReport(filename,infoP,pid);
+	}
+    
+    infoP = NULL;
+    free(infoP);
+    line = NULL;
+    free(line);
+    info = NULL;
+    free(info);
+    valor = NULL;
+    free(valor);
 }
