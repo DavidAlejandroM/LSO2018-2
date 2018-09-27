@@ -1,6 +1,5 @@
 #include "psinfo.h"
-
-
+#include "report.h"
 
 void separarInfoValor(char *linea, char *info, char *valor){
     int i = 0, j = 0;
@@ -18,7 +17,7 @@ void separarInfoValor(char *linea, char *info, char *valor){
     *(valor + j) = 0;
 }
 
-int showInfoProccess(char *pid, FILE *inFile){
+int showInfoProccess(char *pid, FILE *inFile, int type, char *filename){
       // Inicio de la lectura del archivo
     InfoProccess *infoP = malloc(sizeof(InfoProccess));
     char *line = malloc(sizeof(char)*100);
@@ -53,14 +52,23 @@ int showInfoProccess(char *pid, FILE *inFile){
         memset(info, '\0', sizeof(info));
         memset(valor, '\0', sizeof(valor));       
     }
-    printf("Pid: %s\n",pid);
-    printf("Nombre de proceso: %s\n",infoP->name);
-    printf("Estado: %s\n",infoP->state); 
-    printf("Tamaño total de la imagen de memoria: %s\n",infoP->memTotal);
-    printf("\tTamaño de la memoria en la región TEXT: %s\n",infoP->memText);
-    printf("\tTamaño de la memoria en la región DATA: %s\n",infoP->memData);
-    printf("\tTamaño de la memoria en la región STACK: %s\n",infoP->memStack);
-    printf("Número de cambios de contexto realizados (voluntarios - no voluntarios): %s - %s\n",infoP->voluntario,infoP->noVoluntario);
+
+	if(type == 1){
+        printf("Pid: %s\n",pid);
+        printf("Nombre de proceso: %s\n",infoP->name);
+        printf("Estado: %s\n",infoP->state); 
+        printf("Tamaño total de la imagen de memoria: %s\n",infoP->memTotal);
+        printf("\tTamaño de la memoria en la región TEXT: %s\n",infoP->memText);
+        printf("\tTamaño de la memoria en la región DATA: %s\n",infoP->memData);
+        printf("\tTamaño de la memoria en la región STACK: %s\n",infoP->memStack);
+        printf("Número de cambios de contexto realizados (voluntarios - no voluntarios): %s - %s\n",infoP->voluntario,infoP->noVoluntario);
+        printf("-------------------------------------------------------------------------------------------\n");
+	
+    }
+	else if(type == 2){
+		generateReport(filename,infoP,pid);
+	}
+    
     infoP = NULL;
     free(infoP);
     line = NULL;
